@@ -11,7 +11,7 @@ def can_unlock_all(boxes):
             if key < num_boxes:
                 keys.add(key)
                 keys.update(boxes[key])
-            if len(keys) == num_boxes-1:
+            if len(keys) >= num_boxes-1:
                 return True
         if idx not in keys:
             return False
