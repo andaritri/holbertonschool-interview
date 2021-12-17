@@ -1,53 +1,71 @@
 #include "lists.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+/**
+ * create_node - creates a new node of type listint_t
+ * @number: value of the new node
+ *
+ * Return: the address of the new node
+ */
+listint_t *create_node(int number)
+{
+	listint_t *new_node;
+
+	new_node = malloc(sizeof(listint_t));
+	new_node->n = number;
+	new_node->next = NULL;
+
+	return (new_node);
+}
+
+
 /**
  * insert_node - inserts a number into a sorted singly linked list
- * @head: head
- * @number: number to be inserted
+ * @head: double pointer to the first node of the linked list
+ * @number: integer to insert
  *
- * Return: address of the new_node node, or NULL if it failed
+ * Return: the address of the new node, or NULL if failed
  */
+
 listint_t *insert_node(listint_t **head, int number)
 {
-	listint_t *current, *new_node;
-	int previous;
+	listint_t *current;
+	listint_t *p;
+	listint_t *new_node;
 
 	current = *head;
-	new_node = malloc(sizeof(listint_t));
-	if (!new_node)
-    {
-		return (NULL);
-    }
+	p = *head;
+	new_node = create_node(number);
 
+	if (!head || !new_node)
+		return (NULL);
 	if (!*head)
 	{
-		new_node->n = number;
-		new_node->next = NULL;
 		*head = new_node;
 		return (new_node);
 	}
-	new_node->n = number;
-	while (current)
+	if (new_node->n < (*head)->n)
 	{
-		previous = current->n;
-		if (previous >= number)
-		{
-			new_node->next = current;
-			*head = new_node;
-			return (new_node);
-		}
-		else if(!current->next && previous <= number)
+		new_node->next = (*head);
+		*head = new_node;
+		return (new_node);
+	}
+	while (current && *head)
+	{
+		if (current->next == NULL)
 		{
 			current->next = new_node;
 			new_node->next = NULL;
-			return (new_node);
 		}
-		else if (previous <= number && current->next->n >= number)
+		if (current->n > new_node->n)
 		{
-			new_node->next = current->next;
-			current->next = new_node;
-			return (new_node);
+			new_node->next = current;
+			p->next = new_node;
+			break;
 		}
+		p = current;
 		current = current->next;
 	}
-	return (NULL);
+	return (new_node);
 }
