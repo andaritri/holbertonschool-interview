@@ -1,5 +1,5 @@
-#ifndef BINARY_H
-#define BINARY_H
+#ifndef _BINARY_TREES_H_
+#define _BINARY_TREES_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,22 +12,30 @@
  * @left: Pointer to the left child node
  * @right: Pointer to the right child node
  */
-struct binary_tree_s
+typedef struct binary_tree_s
 {
 	int n;
 	struct binary_tree_s *parent;
 	struct binary_tree_s *left;
 	struct binary_tree_s *right;
-};
+} binary_tree_t;
 
 typedef struct binary_tree_s heap_t;
-typedef struct binary_tree_s binary_tree_t;
+
+/**
+ * struct queue - A linked list representing queues.
+ *
+ * @node: heap_t type node (binary tree node)
+ * @next: pointer to the next node
+ */
+typedef struct queue
+{
+	heap_t *node;
+	struct queue *next;
+} queue_t;
 
 void binary_tree_print(const binary_tree_t *);
 binary_tree_t *binary_tree_node(binary_tree_t *parent, int value);
 heap_t *heap_insert(heap_t **root, int value);
-int balance_recursion(const binary_tree_t *tree, int count);
-int binary_tree_balance(const binary_tree_t *tree);
-int binary_tree_is_perfect(const binary_tree_t *tree);
 
-#endif
+#endif /* _BINARY_TREES_H_ */

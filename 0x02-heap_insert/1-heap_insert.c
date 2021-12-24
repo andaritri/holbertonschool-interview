@@ -1,181 +1,138 @@
 #include "binary_trees.h"
 
 /**
- * heap_insert -  inserts a value into a Max Binary Heap
- * @root: double pointer to the root node of the Heap
- * @value: value store in the node to be inserted
- * Return: pointer to the inserted node, or NULL on failure
- * If the address stored in root is NULL,
- * the created node must become the root node.
- * Max Heap ordering
+ * pop - delete the first node of a queue
+ * @h_queue: double pointer to the first element of the queue
  */
-heap_t *heap_insert(heap_t **root, int value)
+void pop(queue_t **h_queue)
 {
-	heap_t *aux = NULL, *new = NULL;
-	int balance = 0, aux_value = 0;
+	queue_t *temp = *h_queue;
 
-	if (root == NULL)
+	*h_queue = (*h_queue)->next;
+	free(temp);
+}
+
+/**
+ * insert - inserts a new node in a queue
+ * @h_queue: double pointer to the first item in queue
+ * @node: node to insert in queue
+ * Return: pointer to the new node
+ */
+queue_t *insert(queue_t **h_queue, heap_t *node)
+{
+	queue_t *new;
+	queue_t *curr;
+
+	new = malloc(sizeof(*new));
+	if (!new)
 		return (NULL);
-	if (*root == NULL)
+	new->node = node;
+	new->next = NULL;
+	curr = *h_queue;
+
+	if (!*h_queue)
 	{
-		*root = binary_tree_node(NULL, value);
-		return (*root);
+		*h_queue = new;
+		return (new);
 	}
-	aux = *root;
-	while (aux->left && aux->right)
+	while (curr->next)
+		curr = curr->next;
+	curr->next = new;
+	return (new);
+}
+
+
+/**
+ * traversal - level order traversal through queue
+ * @root: double pointer to the start of the queue
+ * @value: value to give inserted nodes
+ *
+ * Return: pointer to something
+ */
+heap_t *traversal(heap_t **root, int value)
+{
+	queue_t *h_queue = NULL;
+	heap_t *curr;
+	heap_t *new = NULL;
+
+	if (!insert(&h_queue, *root))
+		return (NULL);
+	while (h_queue)
 	{
-		balance = binary_tree_balance(aux);
-		if ((balance > 0 && binary_tree_is_perfect(aux->left) == 1) ||
-			(binary_tree_is_perfect(aux->right) == 0))
-			aux = aux->right;
-		else
-			aux = aux->left;
-	}
-	if (aux->left == NULL)
-	{
-		new = binary_tree_node(aux, value);
-		aux->left = new;
-	}
-	else
-	{
-		new = binary_tree_node(aux, value);
-		aux->right = new;
-	}
-	while (new->parent != NULL && new->n > new->parent->n)
-	{
-		aux_value = new->parent->n;
-		new->parent->n = new->n;
-		new->n = aux_value;
-		new = new->parent;
+		curr = h_queue->node;
+		if (curr->left)
+		{
+			if (!insert(&h_queue, curr->left))
+				return (NULL);
+		}
+		else if (!new)
+		{
+			new = binary_tree_node(curr, value);
+			curr->left = new;
+			if (!new)
+				return (NULL);
+		}
+		if (curr->right)
+		{
+			if (!insert(&h_queue, curr->right))
+				return (NULL);
+		}
+		else if (!new)
+		{
+			new = binary_tree_node(curr, value);
+			curr->right = new;
+			if (!new)
+				return (NULL);
+
+		}
+		pop(&h_queue);
 	}
 	return (new);
 }
 
-int balance_recursion(const binary_tree_t *tree, int count);
-
 /**
- * binary_tree_balance - measures the balance factor of a binary tree
- * @tree: pointer to the root node of the tree to measure the balance factor
- * Return: balance factor
- * If tree is NULL, return 0
+ * swap - if necessary, swaps the new node's value with it's parent's value
+ * @new: new node to swapt value with
+ *
+ * Return: a pointer to the modified value
  */
-int binary_tree_balance(const binary_tree_t *tree)
+heap_t *swap(heap_t *new)
 {
-	int right_balance = 0;
-	int left_balance = 0;
+	heap_t *ptr = new;
+	int tmp;
 
-	if (tree == NULL)
-		return (0);
-
-	if (tree->left != NULL)
-		left_balance = balance_recursion(tree->left, 1);
-	if (tree->right != NULL)
-		right_balance = balance_recursion(tree->right, 1);
-
-	return (left_balance - right_balance);
+	while (ptr->parent)
+	{
+		if (ptr->n > ptr->parent->n)
+		{
+			tmp = ptr->n;
+			ptr->n = ptr->parent->n;
+			ptr->parent->n = tmp;
+			new = new->parent;
+		}
+		ptr = ptr->parent;
+	}
+	return (new);
 }
 
 /**
- * balance_recursion - aux function for recursion
- * @tree: pointer to tree
- * @count: counter of height
- * Return: height
+ * heap_insert - inserts a value into a Max Binary Heap
+ * @root: double pointer to the root node of the Heap
+ * @value: value stored in the node to be inserted
+ *
+ * Return: a pointer to the inserted node, or NULL on failure
  */
-int balance_recursion(const binary_tree_t *tree, int count)
+heap_t *heap_insert(heap_t **root, int value)
 {
-	int count_r = 0;
-	int count_l = 0;
+	heap_t *new;
 
-	if (tree->left != NULL)
-		count_l = balance_recursion(tree->left, count + 1);
-
-	if (tree->right != NULL)
-		count_r = balance_recursion(tree->right, count + 1);
-
-	if (tree->left == NULL && tree->right == NULL)
-		return (count);
-
-	if (count_r > count_l)
-		return (count_r);
-	else
-		return (count_l);
-}
-
-size_t height_recursion(const binary_tree_t *tree, size_t count);
-size_t leaves_recursion(const binary_tree_t *tree, size_t count);
-
-/**
- * binary_tree_is_perfect - checks if a binary tree is perfect
- * A perfect binary tree is one that all internal nodes have two children
- * and all leaves are at same level
- * @tree: pointer to the root node of the tree to check
- * Return: 1 if perfect, 0 otherwise
- * If tree is NULL, your function must return 0
- */
-int binary_tree_is_perfect(const binary_tree_t *tree)
-{
-	size_t height = 0;
-	size_t leaves = 0;
-	size_t expected_leaves = 1;
-	size_t count;
-
-	if (tree == NULL)
-		return (0);
-
-	height = height_recursion(tree, 0);
-	leaves = leaves_recursion(tree, 0);
-
-	for (count = 0; count < height; count++)
-		expected_leaves = expected_leaves * 2;
-
-	if (expected_leaves == leaves)
-		return (1);
-
-	return (0);
-}
-
-/**
- * leaves_recursion - aux function for recursion
- * @tree: pointer to the root node of the tree to count the number of leaves
- * @count: Counter of leaves
- * Return: Number of leaves
- */
-size_t leaves_recursion(const binary_tree_t *tree, size_t count)
-{
-	if (tree->left != NULL)
-		count = leaves_recursion(tree->left, count);
-
-	if (tree->right != NULL)
-		count = leaves_recursion(tree->right, count);
-
-	if (tree->right == NULL && tree->left == NULL)
-		return (count + 1);
-
-	return (count);
-}
-
-/**
- * height_recursion - aux function for recursion
- * @tree: pointer to tree
- * @count: counter of height
- * Return: height
- */
-size_t height_recursion(const binary_tree_t *tree, size_t count)
-{
-	size_t count_r = 0;
-	size_t count_l = 0;
-
-	if (tree->left != NULL)
-		count_l = height_recursion(tree->left, count + 1);
-
-	if (tree->right != NULL)
-		count_r = height_recursion(tree->right, count + 1);
-
-	if (tree->left == NULL && tree->right == NULL)
-		return (count);
-
-	if (count_r > count_l)
-		return (count_r);
-	else
-		return (count_l);
+	if (!root)
+		return (NULL);
+	if (!*root)
+	{
+		*root = binary_tree_node(*root, value);
+		return (*root);
+	}
+	new = traversal(root, value);
+	return (swap(new));
 }
