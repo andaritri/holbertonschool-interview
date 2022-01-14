@@ -2,20 +2,20 @@
 
 
 /**
- * suma_grid -  Compute the sum of two grids
+ * sum_grids -  Compute the sum of two grids
  * @grid1: grid 1
  * @grid2: grid 2
  * Return: void
  */
-void suma_grid(int grid1[3][3], int grid2[3][3])
+void sum_grids(int grid1[3][3], int grid2[3][3])
 {
-	int m = 0, n = 0;
+	int i = 0, j = 0;
 
-	for (m = 0; m < 3; m++)
+	for (i = 0; i < 3; i++)
 	{
-		for (n = 0; n < 3; n++)
+		for (j = 0; j < 3; j++)
 		{
-			grid1[m][n] += grid2[m][n];
+			grid1[i][j] += grid2[i][j];
 		}
 	}
 }
@@ -27,13 +27,13 @@ void suma_grid(int grid1[3][3], int grid2[3][3])
  */
 int is_unstable(int grid[3][3])
 {
-	int m = 0, n = 0;
+	int i = 0, j = 0;
 
-	for (m = 0; m < 3; m++)
+	for (i = 0; i < 3; i++)
 	{
-		for (n = 0; n < 3; n++)
+		for (j = 0; j < 3; j++)
 		{
-			if (grid[m][n] > 3)
+			if (grid[i][j] > 3)
 			{
 				return (1);
 			}
@@ -50,14 +50,14 @@ int is_unstable(int grid[3][3])
  */
 void print_grid(int grid[3][3])
 {
-	int m = 0, n = 0;
+	int i = 0, j = 0;
 
-	for (m = 0; m < 3; m++)
+	for (i = 0; i < 3; i++)
 	{
-		for (n = 0; n < 3; n++)
+		for (j = 0; j < 3; j++)
 		{
-			printf("%i", grid[m][n]);
-			if (n < 2)
+			printf("%i", grid[i][j]);
+			if (j < 2)
 			{
 				printf(" ");
 			}
@@ -73,34 +73,34 @@ void print_grid(int grid[3][3])
  */
 void stabillize_grid(int grid[3][3])
 {
-	int m = 0, n = 0;
+	int i = 0, j = 0;
 
-	for (m = 0; m < 3; m++)
+	for (i = 0; i < 3; i++)
 	{
-		for (n = 0; n < 3; n++)
+		for (j = 0; j < 3; j++)
 		{
-			if (grid[m][n] > 3)
+			if (grid[i][j] > 3)
 			{
-				grid[m][n] -= 4;
+				grid[i][j] -= 4;
 				/* Up */
-				if (m > 0)
+				if (i > 0)
 				{
-					grid[m - 1][n] += 1;
+					grid[i - 1][j] += 1;
 				}
 				/* Right */
-				if (n < 2)
+				if (j < 2)
 				{
-					grid[m][n + 1] += 1;
+					grid[i][j + 1] += 1;
 				}
 				/* Down */
-				if (m < 2)
+				if (i < 2)
 				{
-					grid[m + 1][n] += 1;
+					grid[i + 1][j] += 1;
 				}
 				/* Left */
-				if (n > 0)
+				if (j > 0)
 				{
-					grid[m][n - 1] += 1;
+					grid[i][j - 1] += 1;
 				}
 			}
 		}
@@ -115,7 +115,7 @@ void stabillize_grid(int grid[3][3])
  */
 void sandpiles_sum(int grid1[3][3], int grid2[3][3])
 {
-	suma_grid(grid1, grid2);
+	sum_grids(grid1, grid2);
 
 	while (is_unstable(grid1))
 	{
