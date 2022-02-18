@@ -4,6 +4,8 @@
 
 
 def validUTF8(data):
+    """UTF-8 validation function
+    """
     count = 0
     for n in data:
         if count == 0:
