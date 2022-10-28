@@ -12,12 +12,21 @@ def makeChange(coins, total):
     if total <= 0:
         return 0
 
-    array = [float('inf')] * (total + 1)
-    array[0] = 0
+    placeholder = total + 1
 
-    for i in range(1, len(array)):
-        for j in range(len(coins)):
-            if coins[j] <= i:
-                array[i] = min(array[i], array[i - coins[j]] + 1)
+    memory = {0: 0}
 
-    return array[i] if array[i] != float('inf') else -1
+    for i in range(1, total + 1):
+        memory[i] = placeholder
+
+        for coin in coins:
+            current = i - coin
+            if current < 0:
+                continue
+
+            memory[i] = min(memory[current] + 1, memory[i])
+
+    if memory[total] == total + 1:
+        return -1
+
+    return memory[total]
